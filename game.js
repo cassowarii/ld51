@@ -239,13 +239,26 @@ function register_resource() {
 
 function game_ready() {
     ready_to_go = true;
-    global_ctx.save();
-    global_ctx.scale(draw_scale, draw_scale);
-    global_ctx.drawImage(clicktostart_img, 0, 0);
-    global_ctx.restore();
+    if (clicktostart_img && clicktostart_img.complete) {
+        global_ctx.save();
+        global_ctx.scale(draw_scale, draw_scale);
+        global_ctx.drawImage(clicktostart_img, 0, 0);
+        global_ctx.restore();
+    }
 }
 
 ready(function() {
+    clicktostart_img = new Image();
+    clicktostart_img.onload = function() {
+        if (ready_to_go) {
+            global_ctx.save();
+            global_ctx.scale(draw_scale, draw_scale);
+            global_ctx.drawImage(clicktostart_img, 0, 0);
+            global_ctx.restore();
+        }
+    }
+    clicktostart_img.src = 'clicktostart.png';
+
     canvas = document.getElementById('canvas');
     global_ctx = canvas.getContext('2d');
     global_ctx.imageSmoothingEnabled = false;
@@ -272,10 +285,12 @@ ready(function() {
 
     loading_img = new Image();
     loading_img.onload = function() {
-        global_ctx.save();
-        global_ctx.scale(draw_scale, draw_scale);
-        global_ctx.drawImage(loading_img, 0, 0);
-        global_ctx.restore();
+        if (!ready_to_go) {
+            global_ctx.save();
+            global_ctx.scale(draw_scale, draw_scale);
+            global_ctx.drawImage(loading_img, 0, 0);
+            global_ctx.restore();
+        }
     }
     loading_img.src = 'loading.png';
 
@@ -348,9 +363,6 @@ ready(function() {
     transition.nodraw = true;
     transition.type = TransitionType.FADE;
     transition.nodraw = false;
-
-    clicktostart_img = new Image();
-    clicktostart_img.src = 'clicktostart.png';
 
     //loop();
 });
